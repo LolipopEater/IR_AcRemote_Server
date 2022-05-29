@@ -1,7 +1,4 @@
-/*********
-  Rui Santos
-  Complete project details at https://randomnerdtutorials.com  
-*********/
+
 #include <SoftwareSerial.h>
 const byte rxPin = 16;
 const byte txPin = 17;
