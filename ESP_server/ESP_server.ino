@@ -2,7 +2,7 @@
 #include <SoftwareSerial.h>
 const byte rxPin = 16;
 const byte txPin = 17;
-SoftwareSerial myremote(16, 17); //SIM800L Tx & Rx is connected to Arduino #3 & #2
+SoftwareSerial myremote(16, 17); //Tx & Rx is connected to Arduino #12 & #11
 
 #include <WiFi.h>
 // Replace with your network credentials
