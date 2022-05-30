@@ -7,7 +7,7 @@ IRrecvPCI myReceiver(2);//pin number for the receiver
 IRsendRaw mySender;
 SoftwareSerial mySerial(11, 12);
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(115200);// start serial
   while (!Serial);
   myReceiver.enableIRIn(); // Start the receiver
   myReceiver.setFrameTimeout(100000);
@@ -19,8 +19,8 @@ void setup() {
 }
 
 #define RAW_DATA_LEN 344
-int counterTemp = 0;
- const uint16_t rawDataOff[RAW_DATA_LEN] PROGMEM ={
+int counterTemp = 0;//counts  how many degree I raised acts like an index too
+ const uint16_t rawDataOff[RAW_DATA_LEN] PROGMEM ={//Off configuration
   8978, 4518, 562, 1706, 558, 1706, 562, 598, 
   546, 598, 546, 586, 554, 602, 546, 598, 
   546, 1710, 558, 602, 546, 1666, 594, 1706, 
@@ -66,7 +66,7 @@ int counterTemp = 0;
   558, 586, 558, 586, 558, 586, 554, 1000};
 
 
-const uint16_t rawDataTemp[6][RAW_DATA_LEN] PROGMEM={{
+const uint16_t rawDataTemp[6][RAW_DATA_LEN] PROGMEM={{//array  of degrees in raw code
   8954, 4510, 602, 1666, 598, 1666, 598, 566, 
   550, 594, 582, 562, 578, 562, 554, 590, 
   582, 1686, 586, 562, 554, 1698, 566, 1698, 
@@ -325,61 +325,66 @@ const uint16_t rawDataTemp[6][RAW_DATA_LEN] PROGMEM={{
   558, 586, 558, 602, 542, 594, 554, 590, 
   550, 1710, 554, 594, 554, 606, 538, 590, 
   554, 590, 554, 606, 538, 586, 582, 1000}};
-uint16_t temp[RAW_DATA_LEN];
+uint16_t temp[RAW_DATA_LEN];// temp to hold the data from PROGGRAM to send out through the transmitter
 
 
-void get(char x)
+void get(char x)// takes the massage from esp332 and working though sending the right code
 {  
   unsigned int displayInt;
   switch(x){
-    case 'o':
-  for (int k = 0; k < RAW_DATA_LEN; k++) {
+    case 'o'://turn on
+  for (int k = 0; k < RAW_DATA_LEN; k++) {//adding to Temp in order to send it
       displayInt = pgm_read_word_near(rawDataOff + k);
       temp[k] = displayInt;
    }
-    mySender.send(temp,RAW_DATA_LEN,38);//Pass the buffer,length, optionally frequency
+      
+      mySender.send(temp,RAW_DATA_LEN,38);//Pass the buffer,length, optionally frequency
       Serial.println(F("AC Switched On"));
       delay(3000);
       break; 
-      case 'd':
+      case 'd'://down temp
       if(counterTemp==0)
       {
         break;
         }
-        counterTemp--;
+      
+      counterTemp--;
       for (int k = 0; k < RAW_DATA_LEN; k++) {
-      displayInt = pgm_read_word_near(rawDataTemp[counterTemp] + k);
-      temp[k] = displayInt;
+         displayInt = pgm_read_word_near(rawDataTemp[counterTemp] + k);
+         temp[k] = displayInt;
        }
       mySender.send(temp,RAW_DATA_LEN,38);//Pass the buffer,length, optionally frequency
       Serial.println(F("AC temp down to "));
       Serial.println(counterTemp);
       delay(3000);
       break; 
-       case 'u':
+       case 'u'://raise temp
        if(counterTemp==6)
       {
-        break;
+          break;
         }
         counterTemp++;
        for (int k = 0; k < RAW_DATA_LEN; k++) {
-      displayInt = pgm_read_word_near(rawDataTemp[counterTemp] + k);
-      temp[k] = displayInt;
+          displayInt = pgm_read_word_near(rawDataTemp[counterTemp] + k);
+          temp[k] = displayInt;
        }
+      
+      
       mySender.send(temp,RAW_DATA_LEN,38);//Pass the buffer,length, optionally frequency
       Serial.println(F("AC temp up to "));
       Serial.println(counterTemp);
       delay(3000);
       break; 
-    }   
+    }
+  
     }
 
   
 void loop() {
-  if (mySerial.available() > 0) {
+  if (mySerial.available() > 0) {//check if we have a massage from ESP throug SoftwareSerial
         get(mySerial.read());      
   }
-    if (myReceiver.getResults()) { 
+    if (myReceiver.getResults()) { //check if we have new incoming signal and decodes it.
     Serial.println(F("Do a cut-and-paste of the following lines into the "));
     Serial.println(F("designated location in rawSend.ino"));
     Serial.print(F("\n#define RAW_DATA_LEN "));
