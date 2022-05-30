@@ -4,18 +4,16 @@
 #include <IRLibRecvPCI.h>
 #include <SoftwareSerial.h>
 IRrecvPCI myReceiver(2);//pin number for the receiver
-IRsendRaw mySender;
+IRsendRaw mySender;//initialize sender
 SoftwareSerial mySerial(11, 12);
 void setup() {
   Serial.begin(115200);// start serial
-  while (!Serial);
-  myReceiver.enableIRIn(); // Start the receiver
-  myReceiver.setFrameTimeout(100000);
-  pinMode(11, INPUT);
-  pinMode(12, OUTPUT);
+  myReceiver.enableIRIn(); // Start the receiver interrupt
+  myReceiver.setFrameTimeout(100000);// set timeframe for interrupt 50us
+  pinMode(11, INPUT);//RX
+  pinMode(12, OUTPUT);//TX
   mySerial.begin(115200);
   delay(2000); 
-  while (!Serial);
 }
 
 #define RAW_DATA_LEN 344
